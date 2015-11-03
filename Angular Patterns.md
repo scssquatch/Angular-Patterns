@@ -1,3 +1,4 @@
+autoscale: true
 footer: © Sharethrough, November XX 2015
 slidenumbers: false
 
@@ -5,10 +6,10 @@ slidenumbers: false
 
 ---
 
-## Conversion Overview
+# Conversion Overview
 
 - Renaming files
-- Converting rails templates to angular templates
+- Converting templates
 - Front-end routing
 - Front-end permissions
 - Fetching data from Rails API
@@ -16,7 +17,7 @@ slidenumbers: false
 
 ---
 
-## Let's start with renaming
+# Renaming
 
 `deals/deals_index_controller.js.coffee`
 becomes
@@ -31,7 +32,7 @@ becomes
 
 ---
 
-## What that looked like for deals
+# Deals Example
 
 ![inline](rename\ before.png)
 
@@ -42,14 +43,33 @@ becomes
 
 ---
 
+# Rails Template
 
-# Nested Lists
+![inline](haml\ before.png)
 
-- You can create nested lists
-    1. by indenting
-    1. each item with 
-    1. 4 spaces
-- It’s that simple
+^ Notice a few things
+- ugly bracket syntax
+- can can usage in markup
+- hrefs
+- in-line rails for model data
+- javascript block for bootstrapping data
+- render partial syntax
+- random double quotes
+
+---
+
+# Angular Template
+
+![inline](haml\ after.png)
+
+^ Good changes
+- more readable attributes
+- no ng-controller declaration
+- if-can directive
+- all rails data lives on controller
+- ng-include over render partial
+- all single quotes unless otherwise needed
+- ui-sref instead of href
 
 ---
 

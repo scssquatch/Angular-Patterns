@@ -1,0 +1,28 @@
+
+%div{ ng: { controller: 'DealsController as dealsCtrl', init: 'dealsCtrl.prepareData()' }}
+  = if can? :manage, Deal
+    %a{ href: "deals/new" } New Deal
+  %td.sensitive
+    {{ dealsCtrl.foo }}
+  %td
+    = @publisher.name
+  = render 'bar_table', ngController: 'dealsCtrl'
+
+:javascript
+  angular.module("deals").run(function (DataService) {
+    DataService.set('publisher', #{@publisher.to_json if @publisher});
+  });
+
+
+
+%div(ng-init='dealsCtrl.prepareData()')
+  %a(ui-sref='dealsNew' if-can='manageDeals') New Deal
+
+  %td.sensitive(ng-bind='dealsCtrl.foo')
+  %td(ng-bind='dealsCtrl.publisher.name')
+
+  %ng-include(src="'deals/bar_table.html'" onLoad='metricsCtrl = dealsCtrl')
+
+
+
+
