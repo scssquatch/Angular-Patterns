@@ -17,14 +17,14 @@ slidenumbers: false
 
 ---
 
-# Renaming
+# Renaming[^1]
 
 `deals/deals_index_controller.js.coffee`
-becomes
-`deals/index.controller.js.coffee`[^1]
+_becomes_
+`deals/index.controller.js.coffee`
 
 `deals/api_service.js.coffee`
-becomes
+_becomes_
 `deals/data_service.js.coffee`
 
 
@@ -73,13 +73,160 @@ becomes
 
 ---
 
-# Links
+# Getting Rails Data
 
-Create links to any external resource—like [a website](http://www.decksetapp.com)—by wrapping link text in square brackets, followed immediately by a set of regular parentheses containing the URL where you want the link to point:
+![inline](Deals\ Data\ Service.png)
 
-`‘[a website](http://www.decksetapp.com)’`
+^ super simple data service
+- could live in bakery.shared, but for now leave here
+- call api endpoint with url with key
 
-Your links will be clickable in exported PDFs as well! 
+---
+
+# Getting Rails Data
+
+![inline](Deals\ Index\ Controller.png)
+
+^ inject deals data service
+- make call, resolve promise and set to instance variable
+- what if you need deal before page loads? We'll get to that later
+
+---
+
+# ifCan Directive
+
+If can:
+
+##`%a(if-can='manageDeals' ui-sref='dealsNew') New Deal`
+
+If cannot:
+
+##`%span(if-can='!manageDeals') Cannot Text`
+
+^ would love to hear if someone knows a better way to do this
+
+---
+
+# Angular Partials
+
+In deals/index.nghaml:
+
+![inline](ng-include.png)
+
+In deals/bar_table.nghaml:
+
+![inline](ng-include-2.png)
+
+^specify the source (directory, name)
+- set internal controller if it is shared in onLoad
+- partial now has access to dealsCtrl/metricsCtrl
+
+---
+
+# Angular Partials
+
+In case wrapping the partial causes issues:
+
+![inline](ng-include-replace.png)
+
+^ This is for things that have css like div > .foo
+- you can use this directive everywhere else too
+
+---
+
+# Angular Routing[^2]
+
+![inline](deals-router-1.png)
+
+[^2]: [https://github.com/angular-ui/ui-router](https://github.com/angular-ui/ui-router)
+
+^ lots going on here
+- lets focus on deals state first
+- url, template, controller, as
+- parent
+- parent state
+- ui-view template
+- data permissions
+
+---
+
+# Angular Routing
+
+<br>
+
+##`%a(ui-sref='dealsNew') New Deal`
+
+^ Will trigger state change
+
+---
+
+# Angular Routing
+
+<br>
+
+##`%a(ui-sref="dealsShow({ dealKey: deal.key})") Show Deal`
+
+^ You can send any params through there
+
+---
+
+# Angular Routing
+
+![inline](route-permissions.png)
+![inline](permissions-constant.png)
+
+^ Make sure you have all permissions in the constant file
+- if you don't, don't worry, you'll be reminded
+
+---
+
+# Angular Routing
+
+![inline](missing-permission.png)
+
+---
+
+# Angular Routing
+
+<br>
+
+![inline](permissions-can.png)
+
+^ There's a lot of technical mumbo jumbo that you can read if you have time
+- but basically it ends up here, checking against the users cancan abilities
+- you can also do custom checking like this
+
+---
+
+# Angular Routing
+
+<br>
+
+![inline](custom-permission-check.png)
+
+^ See here you can use that can method, or do something custom
+- you can modify this file and allow custom attributes or something like that
+- checking role or pub key to only allow user to see their own pub content
+
+---
+
+# Route Authorization
+
+![inline](route-auth.png)
+
+^ lots of stuff here again, but it's not super important to understand
+- basically the parent publisher stuff might be important
+- logged in, unless state is login (doesn't exist yet)
+- if there is a parent you must be able to see parent
+- make sure you can also access curent
+- if unauthorized, go to a pseudo 404 page
+- prevent default if you are not logged in
+- get current user (pseudo log in)
+- set user in session, recurse
+
+---
+
+# State Changes
 
 ---
 
