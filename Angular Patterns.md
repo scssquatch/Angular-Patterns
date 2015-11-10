@@ -1,8 +1,11 @@
 autoscale: true
-footer: © Sharethrough, November XX 2015
+footer: © Sharethrough, November 11 2015
 slidenumbers: false
 
 # Angular Patterns
+
+^ Thank you all for attending
+- hoping we can do something like this pretty frequently
 
 ---
 
@@ -10,10 +13,14 @@ slidenumbers: false
 
 - Renaming files
 - Converting templates
-- Front-end routing
-- Front-end permissions
 - Fetching data from Rails API
 - Creating API controllers
+- Front-end routing
+- Front-end permissions
+
+^ Here are a few things we're gonna go over
+- Some in more detail than others, you can always check out my PR for more detail
+- or just ask me after this
 
 ---
 
@@ -26,6 +33,9 @@ _becomes_
 `deals/api_service.js.coffee`
 _becomes_
 `deals/data_service.js.coffee`
+
+^ doesn't necessarily have to be index/show, etc.
+- just name it after what it's for/ what it does
 
 
 [^1]: [https://github.com/johnpapa/angular-styleguide#naming](https://github.com/johnpapa/angular-styleguide#naming)
@@ -40,6 +50,7 @@ _becomes_
 ![inline](rename\ after.png)
 
 ^ as you can see, some were already correct, others not
+- now lets go over converting the actual templates (next)
 
 ---
 
@@ -50,11 +61,12 @@ _becomes_
 ^ Notice a few things
 - ugly bracket syntax
 - can can usage in markup
-- hrefs
-- in-line rails for model data
+- in-line rails for model data (mix with angular too)
 - javascript block for bootstrapping data
 - render partial syntax
 - random double quotes
+- hrefs
+- and here's where I ended up (next)
 
 ---
 
@@ -62,24 +74,16 @@ _becomes_
 
 ![inline](haml\ after.png)
 
-^ Good changes
-- more readable attributes
-- no ng-controller declaration
-- if-can directive
-- all rails data lives on controller
-- ng-include over render partial
+^ more readable attributes using parentheses
 - all single quotes unless otherwise needed
+- no ng-controller declaration (will address later)
 - ui-sref instead of href
-
----
-
-# Getting Rails Data
-
-![inline](Deals\ Data\ Service.png)
-
-^ super simple data service
-- could live in bakery.shared, but for now leave here
-- call api endpoint with url with key
+- if-can directive
+- ng-bind over mustaches
+- all rails data lives on controller
+- ng-include over render partial (will go over more)
+- no more :javascript
+- here's how we get data instead (next)
 
 ---
 
@@ -89,19 +93,50 @@ _becomes_
 
 ^ inject deals data service
 - make call, resolve promise and set to instance variable
-- what if you need deal before page loads? We'll get to that later
+- what if you need deal before page loads? (We'll get to that later)
+- and heres the data service (next)
+
+---
+
+# Getting Rails Data
+
+![inline](Deals\ Data\ Service.png)
+
+^ super simple data service
+- could live in bakery.shared, but for now leave here (due to future changes)
+- call api endpoint with url with key
+- and heres the api controller (next)
+
+---
+
+# Getting Rails Data
+
+![inline](Deals\ Api\ Controller.png)
+
+^ very simple
+- includes is for rendering seat name without n+1 queries
+- and here are some of those routes that we needed to create
+- authorize resource for ensuring user can see deal
+
+---
+
+# Getting Rails Data
+
+![inline](routes-2.png)
+![inline](routes-1.png)
+
+^ Nothing too crazy here
+- api internal controller
+- globbing for angular routing
+- Home controller index action is blank
 
 ---
 
 # ifCan Directive
 
-If can:
+The frankenstein if-else:
 
-##`%a(if-can='manageDeals' ui-sref='dealsNew') New Deal`
-
-If cannot:
-
-##`%span(if-can='!manageDeals') Cannot Text`
+![inline](ui-sref.png)
 
 ^ would love to hear if someone knows a better way to do this
 
@@ -109,17 +144,18 @@ If cannot:
 
 # Angular Partials
 
-In deals/index.nghaml:
+In `deals/index.nghaml`:
 
 ![inline](ng-include.png)
 
-In deals/bar_table.nghaml:
+In `deals/bar_table.nghaml`:
 
 ![inline](ng-include-2.png)
 
-^specify the source (directory, name)
+^ specify the source (directory, name)
 - set internal controller if it is shared in onLoad
-- partial now has access to dealsCtrl/metricsCtrl
+- partial now has access to dealsCtrl through metricsCtrl
+- lets talk about maybe using ui-view in the future?
 
 ---
 
@@ -140,49 +176,53 @@ In case wrapping the partial causes issues:
 
 [^2]: [https://github.com/angular-ui/ui-router](https://github.com/angular-ui/ui-router)
 
-^ lots going on here
+^ - remember when I got rid of ng-controller? It's here
 - lets focus on deals state first
 - url, template, controller, as
 - parent
 - parent state
 - ui-view template
-- data permissions
+- data permissions (will go over this in a minute)
+- lets jump back to front-end permissions
 
 ---
 
 # Angular Routing
 
-<br>
+New and Show routes:
 
-##`%a(ui-sref='dealsNew') New Deal`
+![inline](new-vs-show.png)
 
-^ Will trigger state change
-
----
-
-# Angular Routing
-
-<br>
-
-##`%a(ui-sref="dealsShow({ dealKey: deal.key})") Show Deal`
-
-^ You can send any params through there
+^ two different state routes
+- one with no params, the other with a required dealkey param
+- both Will trigger state changes, change URL, not reload browser
+- you can also pass arbitrary params to routes and handle them on a case-by-case basis
+- now lets go over permissions (next)
 
 ---
 
 # Angular Routing
+
+##in `deals/router.js.coffee`:
 
 ![inline](route-permissions.png)
+
+##in `shared/permissions.constant.js.coffee`:
+
 ![inline](permissions-constant.png)
 
-^ Make sure you have all permissions in the constant file
-- if you don't, don't worry, you'll be reminded
+^ So, remember that data-permission hash?
+- Make sure you have all permissions in the constant file
+- if you don't, don't worry, you'll be reminded (next)
 
 ---
 
 # Angular Routing
 
 ![inline](missing-permission.png)
+
+^ Auth will fail, and you'll get this console error message
+- Now lets get into some small implementation details about permissions
 
 ---
 
@@ -192,9 +232,12 @@ In case wrapping the partial causes issues:
 
 ![inline](permissions-can.png)
 
-^ There's a lot of technical mumbo jumbo that you can read if you have time
+^ Heres the basic method that does 90% of the work
+- There's a lot of technical details that you're interested
+- checks against manage first, since that encompasses all actions of a feature/resource
+- maybe feature is the wrong variable name here
 - but basically it ends up here, checking against the users cancan abilities
-- you can also do custom checking like this
+- you can also do custom checking like this (next)
 
 ---
 
@@ -204,9 +247,11 @@ In case wrapping the partial causes issues:
 
 ![inline](custom-permission-check.png)
 
-^ See here you can use that can method, or do something custom
-- you can modify this file and allow custom attributes or something like that
+^ This is part of a switch statement in the main canAccess method
+- See here you can use that can method, or do something custom
+- you can modify this file and allow custom attributes or something other than key potentially
 - checking role or pub key to only allow user to see their own pub content
+- and here is where the permission service gets called (next)
 
 ---
 
@@ -215,52 +260,108 @@ In case wrapping the partial causes issues:
 ![inline](route-auth.png)
 
 ^ lots of stuff here again, but it's not super important to understand
+- check if logged in, unless state is login (doesn't exist yet)
 - basically the parent publisher stuff might be important
-- logged in, unless state is login (doesn't exist yet)
 - if there is a parent you must be able to see parent
 - make sure you can also access curent
 - if unauthorized, go to a pseudo 404 page
 - prevent default if you are not logged in
 - get current user (pseudo log in)
 - set user in session, recurse
+- one last thing I'd like to mention
 
 ---
 
-# State Changes
+# Router Resolving
+
+![inline](pre-resolve.png)
+
+^ Router resolving is a very cool concept
+- It takes code from this:
 
 ---
 
-# Display formulas
+# Router Resolving
 
-Easily include mathematical formulas by enclosing TeX commands in `$$` delimiters. Deckset uses [MathJax](http://www.mathjax.org/) to translate TeX commands into beautiful vector graphics.
+![inline](post-resolve.png)
 
-Formula support is available as in-app purchase. See the next slide for an example.
-
-<a name="formulas"></a>
+^ ...to this
 
 ---
 
-## Schrödinger equation
+# Router Resolving
 
-The simplest way to write the time-independent Schrödinger equation is $$H\psi = E\psi$$, however, with the Hamiltonian operator expanded it becomes:
+![inline](route-resolve.png)
 
-$$
--\frac{\hbar^2}{2m} \frac{d^2 \psi}{dx^2} + V\psi = E\psi
-$$
-
----
-
-# Captioned Images and Videos
-
-![inline](room.jpg)
-
-Easily create captions using [inline] images/videos with text underneath.
+^ ...and this
+- Use route resolves for data that is required before the page loads
+- prevents things like stuff showing up then snapping around once data is loaded
+- will cause initial page load to take longer so...
+- we need to establish a pattern showing that the page is loading
+- but it also gets rid of lots of prepareData calls and jittery pages
 
 ---
 
-# Plus: 
+# Gotchas and Interestings
 
-- PDF export for printed handouts
-- Speaker notes and rehearsal mode
-- Switch theme and ratio on the fly
-- Animated GIFs for cheap wins and LOLs :-)
+Coffeescript + Inline-Edit:
+
+![inline](inline-edit-method.png)
+![inline](inline-edit-method-2.png)
+
+^ returning promise made the http request twice
+
+---
+
+# Gotchas and Interestings
+
+Boostrap Modals:
+
+![inline](modal-resolve.png)
+
+^ result callback when modal.close called
+- resolve data into it, without using extra unneeded service
+- added benefit of it being obvious that the modal needs these values (breaks if not present)
+
+---
+
+# Gotchas and Interestings
+
+Boostrap Modals:
+
+![inline](modal-controller.png)
+
+^ placements and dealKey *must* be resolved into it, even if it is just null
+
+---
+
+# Gotchas and Interestings
+
+Camelizing and Decamelizing $http requests
+
+![inline](camelize-http.png)
+
+^ placements and dealKey *must* be resolved into it, even if it is just null
+
+---
+
+# Further Discussion
+
+- Coffeescript: CS classes vs VM syntax?
+- str-directive-name?
+- Plan for separating front-end from back-end
+- Better handling duplication like metrics-related stuff
+- auto-camelize and decamelize http requests
+- relying on cancan abilities JSON
+- plan for future refactor? giant branches are not fun
+
+---
+
+# References
+
+[John Papa's Styleguide](https://github.com/johnpapa/angular-styleguide)
+
+[AngularUI Router](https://github.com/angular-ui/ui-router)
+
+[Angular Devise](https://github.com/cloudspace/angular_devise)
+
