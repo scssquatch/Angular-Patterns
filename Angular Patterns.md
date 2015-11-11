@@ -130,26 +130,17 @@ _becomes_
 - api internal controller
 - globbing for angular routing
 - Home controller index action is blank
-
----
-
-# ifCan Directive
-
-The frankenstein if-else:
-
-![inline](ui-sref.png)
-
-^ would love to hear if someone knows a better way to do this
+- Now lets move on to partials (next)
 
 ---
 
 # Angular Partials
 
-In `deals/index.nghaml`:
+`deals/index.nghaml`
 
 ![inline](ng-include.png)
 
-In `deals/bar_table.nghaml`:
+`deals/bar_table.nghaml`
 
 ![inline](ng-include-2.png)
 
@@ -162,7 +153,7 @@ In `deals/bar_table.nghaml`:
 
 # Angular Partials
 
-In case wrapping the partial causes issues:
+In case wrapping the partial causes issues
 
 ![inline](ng-include-replace.png)
 
@@ -184,7 +175,7 @@ In case wrapping the partial causes issues:
 - parent state
 - ui-view template
 - data permissions (will go over this in a minute)
-- lets jump back to front-end permissions
+- how do i link to these states? (next)
 
 ---
 
@@ -198,32 +189,7 @@ New and Show routes:
 - one with no params, the other with a required dealkey param
 - both Will trigger state changes, change URL, not reload browser
 - you can also pass arbitrary params to routes and handle them on a case-by-case basis
-- now lets go over permissions (next)
-
----
-
-# Angular Routing
-
-##in `deals/router.js.coffee`:
-
-![inline](route-permissions.png)
-
-##in `shared/permissions.constant.js.coffee`:
-
-![inline](permissions-constant.png)
-
-^ So, remember that data-permission hash?
-- Make sure you have all permissions in the constant file
-- if you don't, don't worry, you'll be reminded (next)
-
----
-
-# Angular Routing
-
-![inline](missing-permission.png)
-
-^ Auth will fail, and you'll get this console error message
-- Now lets get into some small implementation details about permissions
+- how about transitioning states in a controller? (next)
 
 ---
 
@@ -231,28 +197,73 @@ New and Show routes:
 
 <br>
 
-![inline](permissions-can.png)
+![inline](controller-route-go.png)
 
-^ Heres the basic method that does 90% of the work
-- There's a lot of technical details that you're interested
-- checks against manage first, since that encompasses all actions of a feature/resource
-- maybe feature is the wrong variable name here
-- but basically it ends up here, checking against the users cancan abilities
-- you can also do custom checking like this (next)
+^ inject state service and call state.go with the state and optional params
+- now lets go over permissions (next)
 
 ---
 
-# Angular Routing
+# Route Authorization
+
+`deals/router.js.coffee`
+
+![inline](route-permissions.png)
+
+`shared/permissions.constant.js.coffee`
+
+![inline](permissions-constant.png)
+
+^ So, remember that data-permission hash?
+- Make sure you have all permissions in the constant file
+- so lets say we wanted to change readDeals in the router to manageDeals (next)
+
+---
+
+# Route Authorization
+
+![inline](missing-permission.png)
+
+^ Auth will fail, and you'll get this console error message
+- Now lets say we added manageDeals to the permissions constant, that's it right? Wrong (next)
+
+---
+
+# Route Authorization
+
+![inline](missing-permission-service.png)
+
+^ Auth will still fail, and you'll get this console error message
+- Now we add manageDeals to the permissions service here (next)
+
+---
+
+# Route Authorization
 
 <br>
 
 ![inline](custom-permission-check.png)
 
 ^ This is part of a switch statement in the main canAccess method
-- See here you can use that can method, or do something custom
+- See here you can use a 'can' method, or do something custom
 - you can modify this file and allow custom attributes or something other than key potentially
 - checking role or pub key to only allow user to see their own pub content
-- and here is where the permission service gets called (next)
+- you can also do custom checking like this
+
+---
+
+# Route Authorization
+
+<br>
+
+![inline](permissions-can.png)
+
+^ Heres the basic method that does 90% of the work
+- There's a lot of technical details that you can look up if you're interested
+- checks against manage first, since that encompasses all actions of a feature/resource
+- maybe feature is the wrong variable name here
+- but basically it ends up here, checking against the users cancan abilities
+- and here is where the permission service gets called during routing (next)
 
 ---
 
@@ -262,6 +273,7 @@ New and Show routes:
 
 ^ lots of stuff here again, but it's not super important to understand
 - check if logged in, unless state is login (doesn't exist yet)
+- should probably just return if state is login
 - basically the parent publisher stuff might be important
 - if there is a parent you must be able to see parent
 - make sure you can also access curent
@@ -269,7 +281,20 @@ New and Show routes:
 - prevent default if you are not logged in
 - get current user (pseudo log in)
 - set user in session, recurse
-- one last thing I'd like to mention
+- okay cool, now how about using auth/permissions on the front-end? (next)
+
+---
+
+# ifCan Directive
+
+The frankenstein if-else
+
+![inline](ui-sref.png)
+
+^ would love to hear if someone knows a better way to do this
+- One last thing
+- what if you need data that is required before the page loads?
+- the page jitters and snaps after resource is loaded. Here's a solution (next)
 
 ---
 
@@ -278,7 +303,7 @@ New and Show routes:
 ![inline](pre-resolve.png)
 
 ^ Router resolving is a very cool concept
-- It takes code from this:
+- It takes code from this (next)
 
 ---
 
@@ -287,6 +312,7 @@ New and Show routes:
 ![inline](post-resolve.png)
 
 ^ ...to this
+- now where does this magical deal object coming from? (next)
 
 ---
 
@@ -294,18 +320,18 @@ New and Show routes:
 
 ![inline](route-resolve.png)
 
-^ ...and this
+^ here!
 - Use route resolves for data that is required before the page loads
-- prevents things like stuff showing up then snapping around once data is loaded
 - will cause initial page load to take longer so...
 - we need to establish a pattern showing that the page is loading
 - but it also gets rid of lots of prepareData calls and jittery pages
+- Now here are a few gotchas I came across while doing this (next)
 
 ---
 
 # Gotchas and Interestings
 
-Coffeescript + Inline-Edit:
+Coffeescript + Inline-Edit
 
 ![inline](inline-edit-method.png)
 ![inline](inline-edit-method-2.png)
@@ -353,9 +379,9 @@ Camelizing and Decamelizing $http requests
 - str-directive-name?
 - Plan for separating front-end from back-end
 - Better handling duplication like metrics-related stuff
-- auto-camelize and decamelize http requests
 - relying on cancan abilities JSON
-- plan for future refactor?
+- plan for future refactorings?
+- feature flagged angular routing?
 
 ---
 
