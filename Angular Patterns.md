@@ -42,7 +42,7 @@ _becomes_
 
 ---
 
-# Deals Example
+# Renaming
 
 ![inline](rename\ before.png)
 
@@ -50,11 +50,12 @@ _becomes_
 ![inline](rename\ after.png)
 
 ^ as you can see, some were already correct, others not
+- data_service vs api.data_service?
 - now lets go over converting the actual templates (next)
 
 ---
 
-# Rails Template
+# Template Conversion
 
 ![inline](haml\ before.png)
 
@@ -70,7 +71,7 @@ _becomes_
 
 ---
 
-# Angular Template
+# Template Conversion
 
 ![inline](haml\ after.png)
 
@@ -315,7 +316,7 @@ Coffeescript + Inline-Edit:
 
 # Gotchas and Interestings
 
-Boostrap Modals:
+Boostrap Modals
 
 ![inline](modal-resolve.png)
 
@@ -327,7 +328,7 @@ Boostrap Modals:
 
 # Gotchas and Interestings
 
-Boostrap Modals:
+Boostrap Modals
 
 ![inline](modal-controller.png)
 
@@ -341,7 +342,8 @@ Camelizing and Decamelizing $http requests
 
 ![inline](camelize-http.png)
 
-^ placements and dealKey *must* be resolved into it, even if it is just null
+^ This is something I'd like to implement sometime soon
+- will require another large branch probably :\
 
 ---
 
@@ -353,7 +355,7 @@ Camelizing and Decamelizing $http requests
 - Better handling duplication like metrics-related stuff
 - auto-camelize and decamelize http requests
 - relying on cancan abilities JSON
-- plan for future refactor? giant branches are not fun
+- plan for future refactor?
 
 ---
 
@@ -364,4 +366,10 @@ Camelizing and Decamelizing $http requests
 [AngularUI Router](https://github.com/angular-ui/ui-router)
 
 [Angular Devise](https://github.com/cloudspace/angular_devise)
+
+[Pull Request](https://github.com/sharethrough/bakery/pull/1018)
+
+---
+
+![inline](thanks.gif)
 
